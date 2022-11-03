@@ -145,12 +145,12 @@ class Product:
 
 
     def end(self):
-        valid_end_params = And(
-            Txn.sender() == Global.creator_address(),
-            App.globalGet(self.GlobalVariables.ended) == Int(0),
-            App.globalGet(
-                self.GlobalVariables.endAt) < Global.latest_timestamp(),
-        )
+        # valid_end_params = And(
+        #     Txn.sender() == Global.creator_address(),
+        #     App.globalGet(self.GlobalVariables.ended) == Int(0),
+        #     App.globalGet(
+        #         self.GlobalVariables.endAt) < Global.latest_timestamp(),
+        # )
         payCreator = Seq([
                 App.globalPut(self.GlobalVariables.ended, Int(1)),
                 self.payUser(Int(0), App.globalGet(
@@ -165,10 +165,10 @@ class Product:
             
 
     def withdraw(self):
-        valid_withdraw_params = And(
-            App.optedIn(Int(0), Int(0)),
-            App.localGet(Int(0), self.LocalVariables.dueAmount) > Int(0),
-        )
+        # valid_withdraw_params = And(
+        #     App.optedIn(Int(0), Int(0)),
+        #     App.localGet(Int(0), self.LocalVariables.dueAmount) > Int(0),
+        # )
 
         return Seq([
             self.payUser(Int(0), App.localGet(
@@ -176,6 +176,7 @@ class Product:
             App.localPut(Int(0), self.LocalVariables.dueAmount, Int(0)),
             Approve()
         ])
+        
         
     def application_deletion(self):
         return Return(Txn.sender() == Global.creator_address())

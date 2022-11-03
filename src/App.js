@@ -65,7 +65,7 @@ const App = function AppWrapper() {
                     </main>
                 </Container>
             ) : (
-                <Cover name={"Street Food"} coverImg={coverImg} connect={connectWallet}/>
+                <Cover name={"Algo Landscape"} coverImg={coverImg} connect={connectWallet}/>
             )}
         </>
     );
