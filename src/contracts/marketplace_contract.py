@@ -3,18 +3,18 @@ from pyteal import *
 
 class Product:
     class GlobalVariables:
-        name = Bytes("name")
-        image = Bytes("image")
-        description = Bytes("description")
-        startingPrice = Bytes("price")
-        instantPrice = Bytes("instantPrice")
-        currentBid = Bytes("currentbid")
-        currentBidder = Bytes("currentBidder")
-        ended = Bytes("ended")
-        endAt = Bytes("endAt")
+        name = Bytes("NAME")
+        image = Bytes("IMAGE")
+        description = Bytes("DESCRIPTION")
+        startingPrice = Bytes("STARTINGPRICE")
+        instantPrice = Bytes("INSTANTPRICE")
+        currentBid = Bytes("CURRENTBID")
+        currentBidder = Bytes("CURRENTBIDDER")
+        ended = Bytes("ENDED")
+        endAt = Bytes("ENDAT")
 
     class LocalVariables:
-        dueAmount = Bytes("dueAmount")
+        dueAmount = Bytes("DUEAMOUNT")
 
     class AppMethods:
         bid = Bytes("bid")
@@ -24,10 +24,10 @@ class Product:
 
     def application_creation(self):
         return Seq([
+            Assert(Txn.note() == Bytes("aucspace:uv1")),
             Assert(
                 And(
-                    Txn.application_args.length() == Int(6),
-                    Txn.note() == Bytes("AucSpaceTest:uv1"),
+                    Txn.application_args.length() == Int(5),
                     Len(Txn.application_args[0]) > Int(0),
                     Len(Txn.application_args[1]) > Int(0),
                     Len(Txn.application_args[2]) > Int(0),
@@ -38,19 +38,17 @@ class Product:
 
             App.globalPut(self.GlobalVariables.name, Txn.application_args[0]),
             App.globalPut(self.GlobalVariables.image, Txn.application_args[1]),
-            App.globalPut(self.GlobalVariables.description,
-                          Txn.application_args[2]),
-            App.globalPut(self.GlobalVariables.startingPrice,
-                          Btoi(Txn.application_args[3])),
-            App.globalPut(self.GlobalVariables.instantPrice,
-                          Btoi(Txn.application_args[4])),
+            App.globalPut(self.GlobalVariables.description,Txn.application_args[2]),
+            App.globalPut(self.GlobalVariables.startingPrice, Btoi(Txn.application_args[3])),
+            App.globalPut(self.GlobalVariables.instantPrice, Btoi(Txn.application_args[4])),
             App.globalPut(self.GlobalVariables.currentBid, Int(0)),
             App.globalPut(self.GlobalVariables.currentBidder, Bytes("")),
             App.globalPut(self.GlobalVariables.ended, Int(0)),
-            App.globalPut(self.GlobalVariables.endAt,
-                          Global.latest_timestamp() + Int(300)),
+            App.globalPut(self.GlobalVariables.endAt, Global.latest_timestamp() + Int(300)),
             Approve()
         ])
+
+
     @Subroutine(TealType.none)
     def payUser(user: Expr, amount: Expr):
         return Seq(
@@ -176,6 +174,12 @@ class Product:
             App.localPut(Int(0), self.LocalVariables.dueAmount, Int(0)),
             Approve()
         ])
+
+    def setOptIn(self):
+        return Seq([
+            App.localPut(Int(0), self.LocalVariables.dueAmount, Int(0)),
+            Approve()
+        ])
         
     def application_deletion(self):
         return Return(Txn.sender() == Global.creator_address())
@@ -185,6 +189,7 @@ class Product:
             [Txn.application_id() == Int(0), self.application_creation()],
             [Txn.on_completion() == OnComplete.DeleteApplication,
              self.application_deletion()],
+            [Txn.on_completion() == OnComplete.OptIn, self.setOptIn()],
             [Txn.application_args[0] == self.AppMethods.buy, self.buy()],
             [Txn.application_args[0] == self.AppMethods.bid, self.bid()],
             [Txn.application_args[0] == self.AppMethods.end, self.end()],
