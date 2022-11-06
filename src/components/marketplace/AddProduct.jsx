@@ -1,27 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Button, Modal, Form, FloatingLabel } from "react-bootstrap";
 import { stringToMicroAlgos } from "../../utils/conversions";
 
 const AddProduct = ({ createProduct }) => {
-	const [name, setName] = useState("");
-	const [image, setImage] = useState("");
-	const [description, setDescription] = useState("");
-	const [location, setLocation] = useState("");
-	const [startingPrice, setStartingPrice] = useState(0);
-	const [instantPrice, setInstantPrice] = useState(0);
-	const [endAt, setEndAt] = useState(0);
+	const [name, setName] = useState("Villa One");
+	const [image, setImage] = useState("https://www.oneandonlyresorts.com/-/media/oneandonly/le-saint-geran/accommodation/villa-one/oolsg-villa-one-living-room-1.jpg");
+	const [description, setDescription] = useState("Description");
+	const [startingPrice, setStartingPrice] = useState("");
+	const [instantPrice, setInstantPrice] = useState("");
 
 	const isFormFilled = useCallback(() => {
-		return name && image && description && price > 0;
+		return name && image && description && startingPrice > 0 && instantPrice;
 	}, [
 		name,
 		image,
 		description,
-		location,
 		startingPrice,
-		instantPrice,
-		endAt,
+		instantPrice
 	]);
 
 	const [show, setShow] = useState(false);
@@ -52,6 +48,7 @@ const AddProduct = ({ createProduct }) => {
 						>
 							<Form.Control
 								type="text"
+								value={name}
 								onChange={(e) => {
 									setName(e.target.value);
 								}}
@@ -66,6 +63,7 @@ const AddProduct = ({ createProduct }) => {
 							<Form.Control
 								type="text"
 								placeholder="Image URL"
+								value={image}
 								onChange={(e) => {
 									setImage(e.target.value);
 								}}
@@ -80,21 +78,9 @@ const AddProduct = ({ createProduct }) => {
 								as="textarea"
 								placeholder="description"
 								style={{ height: "80px" }}
+								value={description}
 								onChange={(e) => {
 									setDescription(e.target.value);
-								}}
-							/>
-						</FloatingLabel>
-						<FloatingLabel
-							controlId="inputLocation"
-							label="Location"
-							className="mb-3"
-						>
-							<Form.Control
-								type="text"
-								placeholder="Location"
-								onChange={(e) => {
-									setLocation(e.target.value);
 								}}
 							/>
 						</FloatingLabel>

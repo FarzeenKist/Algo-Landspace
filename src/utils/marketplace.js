@@ -16,7 +16,7 @@ import clearProgram from "!!raw-loader!../contracts/marketplace_clear.teal";
 import {base64ToUTF8String, utf8ToBase64String} from "./conversions";
 
 class Product {
-    constructor(name, image, description, startingPrice, instantPrice, currentBid, currentBidder, ended, endAt, dueAmount, appId, owner) {
+    constructor(name, image, description, startingPrice, instantPrice, currentBid, currentBidder, ended, endAt, dueAmount, appId, seller) {
         this.name = name;
         this.image = image;
         this.description = description;
@@ -28,7 +28,7 @@ class Product {
         this.endAt = endAt;
         this.dueAmount = dueAmount;
         this.appId = appId;
-        this.owner = owner;
+        this.seller = seller;
     }
 }
 
@@ -42,7 +42,7 @@ const compileProgram = async (programSource) => {
 
 // CREATE PRODUCT: ApplicationCreateTxn
 export const createProductAction = async (senderAddress, product) => {
-    console.log("Adding product...")
+    console.log("Adding product...", product)
 
     let params = await algodClient.getTransactionParams().do();
 
@@ -55,10 +55,11 @@ export const createProductAction = async (senderAddress, product) => {
     let name = new TextEncoder().encode(product.name);
     let image = new TextEncoder().encode(product.image);
     let description = new TextEncoder().encode(product.description);
-    let price = algosdk.encodeUint64(product.price);
+    let startingPrice = algosdk.encodeUint64(product.startingPrice);
+    let instantPrice = algosdk.encodeUint64(product.instantPrice);
 
-    let appArgs = [name, image, description, price]
-
+    let appArgs = [name, image, description, startingPrice, instantPrice]
+    console.log(appArgs)
     // Create ApplicationCreateTxn
     let txn = algosdk.makeApplicationCreateTxnFromObject({
         from: senderAddress,
@@ -82,6 +83,7 @@ export const createProductAction = async (senderAddress, product) => {
     console.log("Signed transaction with txID: %s", txId);
     await algodClient.sendRawTransaction(signedTxn.blob).do();
 
+    console.log("before confirmation")
     // Wait for transaction to be confirmed
     let confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
 
@@ -95,16 +97,16 @@ export const createProductAction = async (senderAddress, product) => {
     return appId;
 }
 
+
 // BUY PRODUCT: Group transaction consisting of ApplicationCallTxn and PaymentTxn
-export const buyProductAction = async (senderAddress, product, count) => {
+export const buyProductAction = async (senderAddress, product) => {
     console.log("Buying product...");
 
     let params = await algodClient.getTransactionParams().do();
 
     // Build required app args as Uint8Array
     let buyArg = new TextEncoder().encode("buy")
-    let countArg = algosdk.encodeUint64(count);
-    let appArgs = [buyArg, countArg]
+    let appArgs = [buyArg]
 
     // Create ApplicationCallTxn
     let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
@@ -118,8 +120,8 @@ export const buyProductAction = async (senderAddress, product, count) => {
     // Create PaymentTxn
     let paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
         from: senderAddress,
-        to: product.owner,
-        amount: product.price * count,
+        to: product.seller,
+        amount: product.instantPrice,
         suggestedParams: params
     })
 
@@ -140,6 +142,133 @@ export const buyProductAction = async (senderAddress, product, count) => {
     // Notify about completion
     console.log("Group transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
 }
+
+
+// BUY PRODUCT: Group transaction consisting of ApplicationCallTxn and PaymentTxn
+export const bidLandAction = async (senderAddress, product, newBid) => {
+    console.log("Buying product...");
+
+    let params = await algodClient.getTransactionParams().do();
+
+    // Build required app args as Uint8Array
+    let bidArg = new TextEncoder().encode("bid")
+    let appArgs = [bidArg]
+
+    // Create ApplicationCallTxn
+    let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
+        from: senderAddress,
+        appIndex: product.appId,
+        onComplete: algosdk.OnApplicationComplete.NoOpOC,
+        suggestedParams: params,
+        appArgs: appArgs
+    })
+
+    // Create PaymentTxn
+    let paymentTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        from: senderAddress,
+        to: product.seller,
+        amount: newBid,
+        suggestedParams: params
+    })
+
+    let txnArray = [appCallTxn, paymentTxn]
+
+    // Create group transaction out of previously build transactions
+    let groupID = algosdk.computeGroupID(txnArray)
+    for (let i = 0; i < 2; i++) txnArray[i].group = groupID;
+
+    // Sign & submit the group transaction
+    let signedTxn = await myAlgoConnect.signTransaction(txnArray.map(txn => txn.toByte()));
+    console.log("Signed group transaction");
+    let tx = await algodClient.sendRawTransaction(signedTxn.map(txn => txn.blob)).do();
+
+    // Wait for group transaction to be confirmed
+    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, tx.txId, 4);
+
+    // Notify about completion
+    console.log("Group transaction " + tx.txId + " confirmed in round " + confirmedTxn["confirmed-round"]);
+}
+
+
+export const endAuctionAction = async (senderAddress, product) => {
+    console.log("Ending Auction...");
+
+
+    let params = await algodClient.getTransactionParams().do();
+
+    // Build required app args as Uint8Array
+    let endArg = new TextEncoder().encode("end");
+    let appArgs = [endArg];
+
+    // Create ApplicationCallTxn
+    let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
+        from: senderAddress,
+        appIndex: algosdk.appId,
+        onComplete: algosdk.OnApplicationComplete.NoOpOC,
+        suggestedParams: params,
+        appArgs: appArgs,
+    });
+
+    // Get transaction ID
+    let txId = appCallTxn.txID().toString();
+
+    // Sign & submit the transaction
+    let signedTxn = await myAlgoConnect.signTransaction(appCallTxn.toByte());
+    console.log("Signed transaction with txID: %s", txId);
+    await algodClient.sendRawTransaction(signedTxn.blob).do();
+
+    // Wait for group transaction to be confirmed
+    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
+
+    // Notify about completion
+    console.log(
+        "Group transaction " +
+        txId +
+        " confirmed in round " +
+        confirmedTxn["confirmed-round"]
+    );
+};
+
+
+
+export const withdrawAction = async (senderAddress, product) => {
+    console.log("Withdrawing...");
+
+
+    let params = await algodClient.getTransactionParams().do();
+
+    // Build required app args as Uint8Array
+    let withdrawArg = new TextEncoder().encode("withdraw");
+    let appArgs = [withdrawArg];
+
+    // Create ApplicationCallTxn
+    let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
+        from: senderAddress,
+        appIndex: algosdk.appId,
+        onComplete: algosdk.OnApplicationComplete.NoOpOC,
+        suggestedParams: params,
+        appArgs: appArgs,
+    });
+
+    // Get transaction ID
+    let txId = appCallTxn.txID().toString();
+
+    // Sign & submit the transaction
+    let signedTxn = await myAlgoConnect.signTransaction(appCallTxn.toByte());
+    console.log("Signed transaction with txID: %s", txId);
+    await algodClient.sendRawTransaction(signedTxn.blob).do();
+
+    // Wait for group transaction to be confirmed
+    let confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
+
+    // Notify about completion
+    console.log(
+        "Group transaction " +
+        txId +
+        " confirmed in round " +
+        confirmedTxn["confirmed-round"]
+    );
+};
 
 // DELETE PRODUCT: ApplicationDeleteTxn
 export const deleteProductAction = async (senderAddress, index) => {
@@ -199,7 +328,7 @@ export const getProductsAction = async () => {
     return products
 }
 
-const getApplication = async (appId) => {
+const getApplication = async (appId, senderAddress) => {
     try {
         // 1. Get application by appId
         let response = await indexerClient.lookupApplications(appId).includeAll(true).do();
@@ -209,12 +338,17 @@ const getApplication = async (appId) => {
         let globalState = response.application.params["global-state"]
 
         // 2. Parse fields of response and return product
-        let owner = response.application.params.creator
+        let seller = response.application.params.creator
         let name = ""
         let image = ""
         let description = ""
-        let price = 0
-        let sold = 0
+        let startingPrice = 0
+        let instantPrice = 0
+        let currentBid = 0
+        let currentBidder = ""
+        let ended = null
+        let endAt = 0
+        let dueAmount = 0;
 
         const getField = (fieldName, globalState) => {
             return globalState.find(state => {
@@ -237,15 +371,44 @@ const getApplication = async (appId) => {
             description = base64ToUTF8String(field)
         }
 
-        if (getField("PRICE", globalState) !== undefined) {
-            price = getField("PRICE", globalState).value.uint
+        if (getField("STARTINGPRICE", globalState) !== undefined) {
+            startingPrice = getField("STARTINGPRICE", globalState).value.uint
+        }
+        if (getField("INSTANTPRICE", globalState) !== undefined) {
+            instantPrice = getField("INSTANTPRICE", globalState).value.uint
+        }
+        if (getField("CURRENTBID", globalState) !== undefined) {
+            currentBid = getField("CURRENTBID", globalState).value.uint
+        }
+        if (getField("CURRENTBIDDER", globalState) !== undefined) {
+            let field = getField("CURRENTBIDDER", globalState).value.bytes
+            currentBidder = base64ToUTF8String(field)
+        }
+        if (getField("ENDED", globalState) !== undefined) {
+            ended = getField("ENDED", globalState).value.uint > 0? true: false;
+        }
+        if (getField("ENDAT", globalState) !== undefined) {
+            endAt = getField("ENDAT", globalState).value.uint
         }
 
-        if (getField("SOLD", globalState) !== undefined) {
-            sold = getField("SOLD", globalState).value.uint
+        let userInfo = await indexerClient
+        .lookupAccountAppLocalStates(senderAddress, {applicationId: appId})
+        .do();
+  
+      let appLocalState = userInfo["apps-local-states"];
+      for (let i = 0; i < appLocalState.length; i++) {
+        if (appId === appLocalState[i]["id"]) {
+          let localState = appLocalState[i]["key-value"];
+          if (getField("DUEAMOUNT", localState) !== undefined) {
+            dueAmount = getField(
+              "DUEAMOUNT",
+              localState
+            ).value.uint;
+          }
         }
+      }
 
-        return new Product(name, image, description, price, sold, appId, owner)
+        return new Product(name, image, description, startingPrice, instantPrice, currentBid, currentBidder, ended, endAt, dueAmount, appId, seller)
     } catch (err) {
         return null;
     }

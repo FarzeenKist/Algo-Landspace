@@ -18,14 +18,14 @@ export const myAlgoConnect = new MyAlgoConnect();
 
 export const minRound = 21540981;
 
-// https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0002.md
-export const marketplaceNote = "tutorial-marketplace:uv1"
+
+export const marketplaceNote = "aucspace:uv1"
 
 // Maximum local storage allocation, immutable
-export const numLocalInts = 0;
+export const numLocalInts = 1; // dueAmount stored as a local Int variable
 export const numLocalBytes = 0;
 // Maximum global storage allocation, immutable
-export const numGlobalInts = 2; // Global variables stored as Int: count, sold
-export const numGlobalBytes = 3; // Global variables stored as Bytes: name, description, image
+export const numGlobalInts = 5; // Global variables stored as Int: startingPrice, instantPrice, currentBid, ended, endAt
+export const numGlobalBytes = 4; // Global variables stored as Bytes: name, description, image, currentBidder
 
 export const ALGORAND_DECIMALS = 6;

@@ -4,7 +4,7 @@ import AddProduct from "./AddProduct";
 import Product from "./Product";
 import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
-import {buyProductAction, createProductAction, deleteProductAction, getProductsAction,} from "../../utils/marketplace";
+import {buyProductAction, bidLandAction, withdrawAction, endAuctionAction, createProductAction, deleteProductAction, getProductsAction,} from "../../utils/marketplace";
 import PropTypes from "prop-types";
 import {Row} from "react-bootstrap";
 
@@ -47,17 +47,62 @@ const Products = ({address, fetchBalance}) => {
             })
     };
 
-    const buyProduct = async (product, count) => {
+    const buyProduct = async (product) => {
         setLoading(true);
-        buyProductAction(address, product, count)
+        buyProductAction(address, product)
             .then(() => {
-                toast(<NotificationSuccess text="Product bought successfully"/>);
+                toast(<NotificationSuccess text="Land bought successfully"/>);
                 getProducts();
                 fetchBalance(address);
             })
             .catch(error => {
                 console.log(error)
-                toast(<NotificationError text="Failed to purchase product."/>);
+                toast(<NotificationError text="Failed to purchase Land."/>);
+                setLoading(false);
+            })
+    };
+
+    const bidLand = async (product, newBid) => {
+        setLoading(true);
+        bidLandAction(address, product, newBid)
+            .then(() => {
+                toast(<NotificationSuccess text="Bidded on Land successfully"/>);
+                getProducts();
+                fetchBalance(address);
+            })
+            .catch(error => {
+                console.log(error)
+                toast(<NotificationError text="Failed to bid on Land."/>);
+                setLoading(false);
+            })
+    };
+
+    const endAuction = async (product) => {
+        setLoading(true);
+        endAuctionAction(address, product)
+            .then(() => {
+                toast(<NotificationSuccess text="Auction ended successfully"/>);
+                getProducts();
+                fetchBalance(address);
+            })
+            .catch(error => {
+                console.log(error)
+                toast(<NotificationError text="Failed to end auction for Land."/>);
+                setLoading(false);
+            })
+    };
+
+    const withdraw = async (product) => {
+        setLoading(true);
+        withdrawAction(address, product)
+            .then(() => {
+                toast(<NotificationSuccess text="Withdrawn successfully"/>);
+                getProducts();
+                fetchBalance(address);
+            })
+            .catch(error => {
+                console.log(error)
+                toast(<NotificationError text="Failed to withdraw amount from Land."/>);
                 setLoading(false);
             })
     };
@@ -92,7 +137,10 @@ const Products = ({address, fetchBalance}) => {
                         <Product
                             address={address}
                             product={product}
-                            buyProduct={buyProduct}
+                            buyLand={buyProduct}
+                            bidLand={bidLand}
+                            endAuction={endAuction}
+                            withdraw={withdraw}
                             deleteProduct={deleteProduct}
                             key={index}
                         />
