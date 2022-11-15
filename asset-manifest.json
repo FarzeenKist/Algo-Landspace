@@ -1,27 +1,27 @@
 {
   "files": {
-    "main.css": "/Algo-Landspace/static/css/main.d1727dd3.chunk.css",
-    "main.js": "/Algo-Landspace/static/js/main.a5c59194.chunk.js",
-    "main.js.map": "/Algo-Landspace/static/js/main.a5c59194.chunk.js.map",
-    "runtime-main.js": "/Algo-Landspace/static/js/runtime-main.d9b40c9e.js",
-    "runtime-main.js.map": "/Algo-Landspace/static/js/runtime-main.d9b40c9e.js.map",
-    "static/css/2.f95363c8.chunk.css": "/Algo-Landspace/static/css/2.f95363c8.chunk.css",
-    "static/js/2.af70250f.chunk.js": "/Algo-Landspace/static/js/2.af70250f.chunk.js",
-    "static/js/2.af70250f.chunk.js.map": "/Algo-Landspace/static/js/2.af70250f.chunk.js.map",
-    "static/js/3.89eedd30.chunk.js": "/Algo-Landspace/static/js/3.89eedd30.chunk.js",
-    "static/js/3.89eedd30.chunk.js.map": "/Algo-Landspace/static/js/3.89eedd30.chunk.js.map",
-    "index.html": "/Algo-Landspace/index.html",
-    "static/css/2.f95363c8.chunk.css.map": "/Algo-Landspace/static/css/2.f95363c8.chunk.css.map",
-    "static/css/main.d1727dd3.chunk.css.map": "/Algo-Landspace/static/css/main.d1727dd3.chunk.css.map",
-    "static/js/2.af70250f.chunk.js.LICENSE.txt": "/Algo-Landspace/static/js/2.af70250f.chunk.js.LICENSE.txt",
-    "static/media/bootstrap-icons.css": "/Algo-Landspace/static/media/bootstrap-icons.c1d7432e.woff",
-    "static/media/sandwich.2d312449.jpg": "/Algo-Landspace/static/media/sandwich.2d312449.jpg"
+    "main.css": "/algorand-react-marketplace/static/css/main.d1727dd3.chunk.css",
+    "main.js": "/algorand-react-marketplace/static/js/main.a1dd5499.chunk.js",
+    "main.js.map": "/algorand-react-marketplace/static/js/main.a1dd5499.chunk.js.map",
+    "runtime-main.js": "/algorand-react-marketplace/static/js/runtime-main.eb8d8d9f.js",
+    "runtime-main.js.map": "/algorand-react-marketplace/static/js/runtime-main.eb8d8d9f.js.map",
+    "static/css/2.5cba8682.chunk.css": "/algorand-react-marketplace/static/css/2.5cba8682.chunk.css",
+    "static/js/2.af70250f.chunk.js": "/algorand-react-marketplace/static/js/2.af70250f.chunk.js",
+    "static/js/2.af70250f.chunk.js.map": "/algorand-react-marketplace/static/js/2.af70250f.chunk.js.map",
+    "static/js/3.89eedd30.chunk.js": "/algorand-react-marketplace/static/js/3.89eedd30.chunk.js",
+    "static/js/3.89eedd30.chunk.js.map": "/algorand-react-marketplace/static/js/3.89eedd30.chunk.js.map",
+    "index.html": "/algorand-react-marketplace/index.html",
+    "static/css/2.5cba8682.chunk.css.map": "/algorand-react-marketplace/static/css/2.5cba8682.chunk.css.map",
+    "static/css/main.d1727dd3.chunk.css.map": "/algorand-react-marketplace/static/css/main.d1727dd3.chunk.css.map",
+    "static/js/2.af70250f.chunk.js.LICENSE.txt": "/algorand-react-marketplace/static/js/2.af70250f.chunk.js.LICENSE.txt",
+    "static/media/bootstrap-icons.css": "/algorand-react-marketplace/static/media/bootstrap-icons.c1d7432e.woff",
+    "static/media/sandwich.2d312449.jpg": "/algorand-react-marketplace/static/media/sandwich.2d312449.jpg"
   },
   "entrypoints": [
-    "static/js/runtime-main.d9b40c9e.js",
-    "static/css/2.f95363c8.chunk.css",
+    "static/js/runtime-main.eb8d8d9f.js",
+    "static/css/2.5cba8682.chunk.css",
     "static/js/2.af70250f.chunk.js",
     "static/css/main.d1727dd3.chunk.css",
-    "static/js/main.a5c59194.chunk.js"
+    "static/js/main.a1dd5499.chunk.js"
   ]
 }
