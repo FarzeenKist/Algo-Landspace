@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/algorand-react-marketplace/static/css/main.d1727dd3.chunk.css",
-    "main.js": "/algorand-react-marketplace/static/js/main.a1dd5499.chunk.js",
-    "main.js.map": "/algorand-react-marketplace/static/js/main.a1dd5499.chunk.js.map",
+    "main.js": "/algorand-react-marketplace/static/js/main.26a1ed15.chunk.js",
+    "main.js.map": "/algorand-react-marketplace/static/js/main.26a1ed15.chunk.js.map",
     "runtime-main.js": "/algorand-react-marketplace/static/js/runtime-main.eb8d8d9f.js",
     "runtime-main.js.map": "/algorand-react-marketplace/static/js/runtime-main.eb8d8d9f.js.map",
     "static/css/2.5cba8682.chunk.css": "/algorand-react-marketplace/static/css/2.5cba8682.chunk.css",
@@ -22,6 +22,6 @@
     "static/css/2.5cba8682.chunk.css",
     "static/js/2.af70250f.chunk.js",
     "static/css/main.d1727dd3.chunk.css",
-    "static/js/main.a1dd5499.chunk.js"
+    "static/js/main.26a1ed15.chunk.js"
   ]
 }
