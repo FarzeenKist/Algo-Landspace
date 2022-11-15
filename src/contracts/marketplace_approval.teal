@@ -2,68 +2,25 @@
 txn ApplicationID
 int 0
 ==
-bnz main_l22
+bnz main_l18
 txn OnCompletion
 int DeleteApplication
 ==
-bnz main_l21
-txn OnCompletion
-int OptIn
-==
-bnz main_l20
+bnz main_l17
 txna ApplicationArgs 0
 byte "buy"
 ==
-bnz main_l15
+bnz main_l12
 txna ApplicationArgs 0
 byte "bid"
 ==
-bnz main_l14
+bnz main_l9
 txna ApplicationArgs 0
 byte "end"
 ==
-bnz main_l11
-txna ApplicationArgs 0
-byte "withdraw"
-==
-bnz main_l8
+bnz main_l6
 err
-main_l8:
-txna Accounts 0
-txna Applications 0
-app_opted_in
-txna Accounts 0
-byte "DUEAMOUNT"
-app_local_get
-int 0
->
-&&
-byte "ENDED"
-app_global_get
-int 1
-==
-&&
-byte "ENDAT"
-app_global_get
-global LatestTimestamp
-<
-&&
-bnz main_l10
-int 0
-return
-main_l10:
-txna Accounts 0
-txna Accounts 0
-byte "DUEAMOUNT"
-app_local_get
-callsub payUser_0
-txna Accounts 0
-byte "DUEAMOUNT"
-int 0
-app_local_put
-int 1
-return
-main_l11:
+main_l6:
 txn Sender
 global CreatorAddress
 ==
@@ -82,42 +39,27 @@ byte "CURRENTBID"
 app_global_get
 byte "STARTINGPRICE"
 app_global_get
->
-bnz main_l13
-main_l12:
+>=
+bnz main_l8
+main_l7:
 byte "ENDED"
 int 1
 app_global_put
 int 1
 return
-main_l13:
+main_l8:
 txna Accounts 0
 byte "CURRENTBID"
 app_global_get
 callsub payUser_0
-b main_l12
-main_l14:
-txna Accounts 0
-byte "DUEAMOUNT"
-app_local_get
-gtxn 1 Amount
-+
-store 0
+b main_l7
+main_l9:
 global GroupSize
 int 2
 ==
-txn NumAccounts
-int 1
-==
-txna Accounts 1
-byte "CURRENTBIDDER"
-app_global_get
-==
-&&
 gtxn 1 TypeEnum
 int pay
 ==
-&&
 gtxn 1 Receiver
 global CurrentApplicationAddress
 ==
@@ -127,13 +69,9 @@ gtxn 0 Sender
 ==
 &&
 &&
-txna Accounts 0
-txna Applications 0
-app_opted_in
 gtxn 0 Sender
 global CreatorAddress
 !=
-&&
 byte "ENDED"
 app_global_get
 int 0
@@ -146,7 +84,7 @@ global LatestTimestamp
 &&
 byte "CURRENTBIDDER"
 app_global_get
-txn Sender
+gtxn 0 Sender
 !=
 &&
 byte "STARTINGPRICE"
@@ -156,29 +94,33 @@ gtxn 1 Amount
 &&
 byte "CURRENTBID"
 app_global_get
-load 0
+gtxn 1 Amount
 <
 &&
 &&
 assert
-txna Accounts 1
-byte "DUEAMOUNT"
-byte "CURRENTBID"
+byte "CURRENTBIDDER"
 app_global_get
-app_local_put
+global CreatorAddress
+!=
+bnz main_l11
+main_l10:
 byte "CURRENTBIDDER"
 gtxn 0 Sender
 app_global_put
 byte "CURRENTBID"
-load 0
+gtxn 1 Amount
 app_global_put
-txna Accounts 0
-byte "DUEAMOUNT"
-int 0
-app_local_put
 int 1
 return
-main_l15:
+main_l11:
+byte "CURRENTBIDDER"
+app_global_get
+byte "CURRENTBID"
+app_global_get
+callsub payUser_0
+b main_l10
+main_l12:
 global GroupSize
 int 2
 ==
@@ -199,13 +141,9 @@ app_global_get
 ==
 &&
 &&
-txna Accounts 0
-txna Applications 0
-app_opted_in
 gtxn 0 Sender
 global CreatorAddress
 !=
-&&
 byte "ENDED"
 app_global_get
 int 0
@@ -223,19 +161,27 @@ app_global_get
 <
 &&
 &&
-bnz main_l17
+bnz main_l14
 int 0
 return
-main_l17:
+main_l14:
 byte "CURRENTBIDDER"
 app_global_get
-len
-int 0
->
-bnz main_l19
-main_l18:
+global CreatorAddress
+!=
+bnz main_l16
+main_l15:
+global CurrentApplicationAddress
+balance
+global CurrentApplicationAddress
+min_balance
+-
+store 0
+global CreatorAddress
+load 0
+callsub payUser_0
 byte "CURRENTBIDDER"
-txn Sender
+gtxn 0 Sender
 app_global_put
 byte "CURRENTBID"
 gtxn 1 Amount
@@ -245,32 +191,24 @@ int 1
 app_global_put
 int 1
 return
-main_l19:
+main_l16:
 byte "CURRENTBIDDER"
 app_global_get
-byte "DUEAMOUNT"
 byte "CURRENTBID"
 app_global_get
-app_local_put
-b main_l18
-main_l20:
-txna Accounts 0
-byte "DUEAMOUNT"
-int 0
-app_local_put
-int 1
-return
-main_l21:
+callsub payUser_0
+b main_l15
+main_l17:
 txn Sender
 global CreatorAddress
 ==
 return
-main_l22:
+main_l18:
 txn NumAppArgs
-int 6
+int 5
 ==
 txn Note
-byte "AucSpaceTest:uv1"
+byte "aucspace:uv1"
 ==
 &&
 txna ApplicationArgs 0
@@ -298,10 +236,11 @@ btoi
 int 0
 >
 &&
-txna ApplicationArgs 5
+txna ApplicationArgs 4
 btoi
-int 0
-<
+txna ApplicationArgs 3
+btoi
+>
 &&
 assert
 byte "NAME"
@@ -325,15 +264,14 @@ byte "CURRENTBID"
 int 0
 app_global_put
 byte "CURRENTBIDDER"
-byte ""
+txn Sender
 app_global_put
 byte "ENDED"
 int 0
 app_global_put
 byte "ENDAT"
 global LatestTimestamp
-txna ApplicationArgs 5
-btoi
+int 500
 +
 app_global_put
 int 1

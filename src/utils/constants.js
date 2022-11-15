@@ -16,13 +16,13 @@ export const indexerClient = new algosdk.Indexer(config.indexerToken, config.ind
 
 export const myAlgoConnect = new MyAlgoConnect();
 
-export const minRound = 21540981;
+export const minRound =  25580192;
 
 
 export const marketplaceNote = "aucspace:uv1"
 
 // Maximum local storage allocation, immutable
-export const numLocalInts = 1; // dueAmount stored as a local Int variable
+export const numLocalInts = 0; 
 export const numLocalBytes = 0;
 // Maximum global storage allocation, immutable
 export const numGlobalInts = 5; // Global variables stored as Int: startingPrice, instantPrice, currentBid, ended, endAt
