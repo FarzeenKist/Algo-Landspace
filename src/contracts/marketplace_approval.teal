@@ -2,17 +2,183 @@
 txn ApplicationID
 int 0
 ==
-bnz main_l8
+bnz main_l22
 txn OnCompletion
 int DeleteApplication
 ==
-bnz main_l7
+bnz main_l21
+txn OnCompletion
+int OptIn
+==
+bnz main_l20
 txna ApplicationArgs 0
 byte "buy"
 ==
-bnz main_l4
+bnz main_l15
+txna ApplicationArgs 0
+byte "bid"
+==
+bnz main_l14
+txna ApplicationArgs 0
+byte "end"
+==
+bnz main_l11
+txna ApplicationArgs 0
+byte "withdraw"
+==
+bnz main_l8
 err
-main_l4:
+main_l8:
+txna Accounts 0
+txna Applications 0
+app_opted_in
+txna Accounts 0
+byte "DUEAMOUNT"
+app_local_get
+int 0
+>
+&&
+byte "ENDED"
+app_global_get
+int 1
+==
+&&
+byte "ENDAT"
+app_global_get
+global LatestTimestamp
+<
+&&
+bnz main_l10
+int 0
+return
+main_l10:
+txna Accounts 0
+txna Accounts 0
+byte "DUEAMOUNT"
+app_local_get
+callsub payUser_0
+txna Accounts 0
+byte "DUEAMOUNT"
+int 0
+app_local_put
+int 1
+return
+main_l11:
+txn Sender
+global CreatorAddress
+==
+byte "ENDED"
+app_global_get
+int 0
+==
+&&
+byte "ENDAT"
+app_global_get
+global LatestTimestamp
+<
+&&
+assert
+byte "CURRENTBID"
+app_global_get
+byte "STARTINGPRICE"
+app_global_get
+>
+bnz main_l13
+main_l12:
+byte "ENDED"
+int 1
+app_global_put
+int 1
+return
+main_l13:
+txna Accounts 0
+byte "CURRENTBID"
+app_global_get
+callsub payUser_0
+b main_l12
+main_l14:
+txna Accounts 0
+byte "DUEAMOUNT"
+app_local_get
+gtxn 1 Amount
++
+store 0
+global GroupSize
+int 2
+==
+txn NumAccounts
+int 1
+==
+txna Accounts 1
+byte "CURRENTBIDDER"
+app_global_get
+==
+&&
+gtxn 1 TypeEnum
+int pay
+==
+&&
+gtxn 1 Receiver
+global CurrentApplicationAddress
+==
+&&
+gtxn 1 Sender
+gtxn 0 Sender
+==
+&&
+&&
+txna Accounts 0
+txna Applications 0
+app_opted_in
+gtxn 0 Sender
+global CreatorAddress
+!=
+&&
+byte "ENDED"
+app_global_get
+int 0
+==
+&&
+byte "ENDAT"
+app_global_get
+global LatestTimestamp
+>
+&&
+byte "CURRENTBIDDER"
+app_global_get
+txn Sender
+!=
+&&
+byte "STARTINGPRICE"
+app_global_get
+gtxn 1 Amount
+<=
+&&
+byte "CURRENTBID"
+app_global_get
+load 0
+<
+&&
+&&
+assert
+txna Accounts 1
+byte "DUEAMOUNT"
+byte "CURRENTBID"
+app_global_get
+app_local_put
+byte "CURRENTBIDDER"
+gtxn 0 Sender
+app_global_put
+byte "CURRENTBID"
+load 0
+app_global_put
+txna Accounts 0
+byte "DUEAMOUNT"
+int 0
+app_local_put
+int 1
+return
+main_l15:
 global GroupSize
 int 2
 ==
@@ -23,50 +189,120 @@ gtxn 1 Receiver
 global CreatorAddress
 ==
 &&
-gtxn 1 Amount
-byte "PRICE"
-app_global_get
-txna ApplicationArgs 1
-btoi
-*
-==
-&&
 gtxn 1 Sender
 gtxn 0 Sender
 ==
 &&
+gtxn 1 Amount
+byte "INSTANTPRICE"
+app_global_get
+==
 &&
-bnz main_l6
+&&
+txna Accounts 0
+txna Applications 0
+app_opted_in
+gtxn 0 Sender
+global CreatorAddress
+!=
+&&
+byte "ENDED"
+app_global_get
+int 0
+==
+&&
+byte "ENDAT"
+app_global_get
+global LatestTimestamp
+>
+&&
+byte "CURRENTBID"
+app_global_get
+byte "INSTANTPRICE"
+app_global_get
+<
+&&
+&&
+bnz main_l17
 int 0
 return
-main_l6:
-byte "SOLD"
-byte "SOLD"
+main_l17:
+byte "CURRENTBIDDER"
 app_global_get
-txna ApplicationArgs 1
-btoi
-+
+len
+int 0
+>
+bnz main_l19
+main_l18:
+byte "CURRENTBIDDER"
+txn Sender
+app_global_put
+byte "CURRENTBID"
+gtxn 1 Amount
+app_global_put
+byte "ENDED"
+int 1
 app_global_put
 int 1
 return
-main_l7:
+main_l19:
+byte "CURRENTBIDDER"
+app_global_get
+byte "DUEAMOUNT"
+byte "CURRENTBID"
+app_global_get
+app_local_put
+b main_l18
+main_l20:
+txna Accounts 0
+byte "DUEAMOUNT"
+int 0
+app_local_put
+int 1
+return
+main_l21:
 txn Sender
 global CreatorAddress
 ==
 return
-main_l8:
+main_l22:
 txn NumAppArgs
-int 4
+int 6
 ==
-assert
 txn Note
-byte "tutorial-marketplace:uv1"
+byte "AucSpaceTest:uv1"
 ==
-assert
+&&
+txna ApplicationArgs 0
+len
+int 0
+>
+&&
+txna ApplicationArgs 1
+len
+int 0
+>
+&&
+txna ApplicationArgs 2
+len
+int 0
+>
+&&
 txna ApplicationArgs 3
 btoi
 int 0
 >
+&&
+txna ApplicationArgs 4
+btoi
+int 0
+>
+&&
+txna ApplicationArgs 5
+btoi
+int 0
+<
+&&
 assert
 byte "NAME"
 txna ApplicationArgs 0
@@ -77,12 +313,44 @@ app_global_put
 byte "DESCRIPTION"
 txna ApplicationArgs 2
 app_global_put
-byte "PRICE"
+byte "STARTINGPRICE"
 txna ApplicationArgs 3
 btoi
 app_global_put
-byte "SOLD"
+byte "INSTANTPRICE"
+txna ApplicationArgs 4
+btoi
+app_global_put
+byte "CURRENTBID"
 int 0
+app_global_put
+byte "CURRENTBIDDER"
+byte ""
+app_global_put
+byte "ENDED"
+int 0
+app_global_put
+byte "ENDAT"
+global LatestTimestamp
+txna ApplicationArgs 5
+btoi
++
 app_global_put
 int 1
 return
+
+// payUser
+payUser_0:
+store 2
+store 1
+itxn_begin
+int pay
+itxn_field TypeEnum
+load 2
+global MinTxnFee
+-
+itxn_field Amount
+load 1
+itxn_field Receiver
+itxn_submit
+retsub
