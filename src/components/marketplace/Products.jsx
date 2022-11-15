@@ -14,7 +14,7 @@ const Products = ({address, fetchBalance}) => {
 
     const getProducts = async () => {
         setLoading(true);
-        getProductsAction()
+        getProductsAction(address)
             .then(products => {
                 if (products) {
                     setProducts(products);

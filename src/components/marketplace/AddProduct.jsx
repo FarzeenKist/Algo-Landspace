@@ -5,7 +5,7 @@ import { stringToMicroAlgos } from "../../utils/conversions";
 
 const AddProduct = ({ createProduct }) => {
 	const [name, setName] = useState("Villa One");
-	const [image, setImage] = useState("https://www.oneandonlyresorts.com/-/media/oneandonly/le-saint-geran/accommodation/villa-one/oolsg-villa-one-living-room-1.jpg");
+	const [image, setImage] = useState("https://www.captamarin.mu/wp-content/uploads/2019/12/villas-aloes-cap-tamarin-exterieur.jpg");
 	const [description, setDescription] = useState("Description");
 	const [startingPrice, setStartingPrice] = useState("");
 	const [instantPrice, setInstantPrice] = useState("");

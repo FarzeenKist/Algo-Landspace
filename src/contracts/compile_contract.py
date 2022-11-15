@@ -1,10 +1,10 @@
 from pyteal import *
 
-from marketplace_contract import Product
+from marketplace_contract import Land
 
 if __name__ == "__main__":
-    approval_program = Product().approval_program()
-    clear_program = Product().clear_program()
+    approval_program = Land().approval_program()
+    clear_program = Land().clear_program()
 
     # Mode.Application specifies that this is a smart contract
     compiled_approval = compileTeal(approval_program, Mode.Application, version=6)
