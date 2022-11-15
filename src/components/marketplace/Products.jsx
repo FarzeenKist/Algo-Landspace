@@ -4,7 +4,7 @@ import AddProduct from "./AddProduct";
 import Product from "./Product";
 import Loader from "../utils/Loader";
 import {NotificationError, NotificationSuccess} from "../utils/Notifications";
-import {buyProductAction, bidLandAction, withdrawAction, endAuctionAction, createProductAction, deleteProductAction, getProductsAction,} from "../../utils/marketplace";
+import {buyProductAction, bidLandAction, endAuctionAction, createProductAction, deleteProductAction, getProductsAction,} from "../../utils/marketplace";
 import PropTypes from "prop-types";
 import {Row} from "react-bootstrap";
 
@@ -92,21 +92,6 @@ const Products = ({address, fetchBalance}) => {
             })
     };
 
-    const withdraw = async (product) => {
-        setLoading(true);
-        withdrawAction(address, product)
-            .then(() => {
-                toast(<NotificationSuccess text="Withdrawn successfully"/>);
-                getProducts();
-                fetchBalance(address);
-            })
-            .catch(error => {
-                console.log(error)
-                toast(<NotificationError text="Failed to withdraw amount from Land."/>);
-                setLoading(false);
-            })
-    };
-
     const deleteProduct = async (product) => {
         setLoading(true);
         deleteProductAction(address, product.appId)
@@ -128,7 +113,7 @@ const Products = ({address, fetchBalance}) => {
     return (
         <>
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1 className="fs-4 fw-bold mb-0">Street Food</h1>
+                <h1 className="fs-4 fw-bold mb-0">LandSpace</h1>
                 <AddProduct createProduct={createProduct}/>
             </div>
             <Row xs={1} sm={2} lg={3} className="g-3 mb-5 g-xl-4 g-xxl-5">
@@ -140,7 +125,6 @@ const Products = ({address, fetchBalance}) => {
                             buyLand={buyProduct}
                             bidLand={bidLand}
                             endAuction={endAuction}
-                            withdraw={withdraw}
                             deleteProduct={deleteProduct}
                             key={index}
                         />

@@ -55,7 +55,7 @@ const compileProgram = async (programSource) => {
 
 // CREATE PRODUCT: ApplicationCreateTxn
 export const createProductAction = async (senderAddress, product) => {
-	console.log("Adding product...", product);
+	console.log("Adding land...", product);
 
 	let params = await algodClient.getTransactionParams().do();
 
@@ -72,7 +72,6 @@ export const createProductAction = async (senderAddress, product) => {
 	let instantPrice = algosdk.encodeUint64(product.instantPrice);
 
 	let appArgs = [name, image, description, startingPrice, instantPrice];
-	console.log(appArgs);
 	// Create ApplicationCreateTxn
 	let txn = algosdk.makeApplicationCreateTxnFromObject({
 		from: senderAddress,
@@ -141,9 +140,9 @@ export const createProductAction = async (senderAddress, product) => {
 	return appId;
 };
 
-// BUY PRODUCT: Group transaction consisting of ApplicationCallTxn and PaymentTxn
+// Buy LAND: Group transaction consisting of ApplicationCallTxn and PaymentTxn
 export const buyProductAction = async (senderAddress, product) => {
-	console.log("Buying product...");
+	console.log("Buying land...");
 	let params = await algodClient.getTransactionParams().do();
 
 	// Build required app args as Uint8Array
@@ -200,7 +199,7 @@ export const buyProductAction = async (senderAddress, product) => {
 	);
 };
 
-// BUY PRODUCT: Group transaction consisting of ApplicationCallTxn and PaymentTxn
+// Bid LAND: Group transaction consisting of ApplicationCallTxn and PaymentTxn
 export const bidLandAction = async (senderAddress, product, newBid) => {
 	console.log("Bidding on product...");
 	let params = await algodClient.getTransactionParams().do();
@@ -209,7 +208,6 @@ export const bidLandAction = async (senderAddress, product, newBid) => {
 	let bidArg = new TextEncoder().encode("bid");
 	let appArgs = [bidArg];
 	let accounts = [product.currentBidder];
-	console.log(accounts);
 	// Create ApplicationCallTxn
 	let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
 		from: senderAddress,
@@ -296,43 +294,6 @@ export const endAuctionAction = async (senderAddress, product) => {
 	);
 };
 
-export const withdrawAction = async (senderAddress, product) => {
-	console.log("Withdrawing...");
-
-	let params = await algodClient.getTransactionParams().do();
-
-	// Build required app args as Uint8Array
-	let withdrawArg = new TextEncoder().encode("withdraw");
-	let appArgs = [withdrawArg];
-
-	// Create ApplicationCallTxn
-	let appCallTxn = algosdk.makeApplicationCallTxnFromObject({
-		from: senderAddress,
-		appIndex: algosdk.appId,
-		onComplete: algosdk.OnApplicationComplete.NoOpOC,
-		suggestedParams: params,
-		appArgs: appArgs,
-	});
-
-	// Get transaction ID
-	let txId = appCallTxn.txID().toString();
-
-	// Sign & submit the transaction
-	let signedTxn = await myAlgoConnect.signTransaction(appCallTxn.toByte());
-	console.log("Signed transaction with txID: %s", txId);
-	await algodClient.sendRawTransaction(signedTxn.blob).do();
-
-	// Wait for group transaction to be confirmed
-	let confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
-
-	// Notify about completion
-	console.log(
-		"Group transaction " +
-			txId +
-			" confirmed in round " +
-			confirmedTxn["confirmed-round"]
-	);
-};
 
 // DELETE PRODUCT: ApplicationDeleteTxn
 export const deleteProductAction = async (senderAddress, index) => {
@@ -378,9 +339,9 @@ export const deleteProductAction = async (senderAddress, index) => {
 	console.log("Deleted app-id: ", appId);
 };
 
-// GET PRODUCTS: Use indexer
+// GET LANDS: Use indexer
 export const getProductsAction = async (senderAddress) => {
-	console.log("Fetching products...");
+	console.log("Fetching lands...");
 	let note = new TextEncoder().encode(marketplaceNote);
 	let encodedNote = Buffer.from(note).toString("base64");
 
@@ -402,7 +363,7 @@ export const getProductsAction = async (senderAddress) => {
 			}
 		}
 	}
-	console.log("Products fetched.");
+	console.log("Lands fetched.");
 	return products;
 };
 
@@ -418,7 +379,7 @@ const getApplication = async (appId, senderAddress) => {
 		}
 		let globalState = response.application.params["global-state"];
 
-		// 2. Parse fields of response and return product
+		// 2. Parse fields of response and return land
 		let seller = response.application.params.creator;
 		let name = "";
 		let image = "";

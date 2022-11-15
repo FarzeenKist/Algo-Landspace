@@ -11,7 +11,7 @@ const AddProduct = ({ createProduct }) => {
 	const [instantPrice, setInstantPrice] = useState("");
 
 	const isFormFilled = useCallback(() => {
-		return name && image && description && startingPrice > 0 && instantPrice;
+		return name && image && description && startingPrice && instantPrice;
 	}, [
 		name,
 		image,

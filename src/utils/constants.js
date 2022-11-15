@@ -16,7 +16,7 @@ export const indexerClient = new algosdk.Indexer(config.indexerToken, config.ind
 
 export const myAlgoConnect = new MyAlgoConnect();
 
-export const minRound =  25568996;
+export const minRound =  25580192;
 
 
 export const marketplaceNote = "aucspace:uv1"

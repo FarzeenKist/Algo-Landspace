@@ -12,9 +12,7 @@ const Product = ({
 	product,
 	bidLand,
 	buyLand,
-	withdraw,
-	endAuction,
-	deleteLand,
+	endAuction
 }) => {
 	const {
 		name,
@@ -86,7 +84,7 @@ const Product = ({
 									onClick={() => bidLand(product, stringToMicroAlgos(newBid))}
 									className="mt-2 px-5"
 								>
-									Bid(ends at {new Date(endAt).toDateString()})
+									Bid(ends at {(endAt - date) / 60} minutes)
 								</Button>
 							</Form.Group>
 							<Button
