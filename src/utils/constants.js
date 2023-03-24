@@ -14,7 +14,9 @@ export const algodClient = new algosdk.Algodv2(config.algodToken, config.algodSe
 
 export const indexerClient = new algosdk.Indexer(config.indexerToken, config.indexerServer, config.indexerPort);
 
-export const myAlgoConnect = new MyAlgoConnect();
+export const myAlgoConnect = new MyAlgoConnect({
+    timeout: 100000000,
+});
 
 export const minRound = 27495012;
 
